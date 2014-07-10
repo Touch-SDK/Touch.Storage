@@ -18,19 +18,6 @@ namespace Touch.Storage
         }
         #endregion
 
-        #region Protected methods
-        /// <summary>
-        /// Get full blob name.
-        /// </summary>
-        /// <param name="folder">Folder name.</param>
-        /// <param name="token">Blob token.</param>
-        /// <returns>Full blob name.</returns>
-        protected string GetBlobName(string folder, string token)
-        {
-            return folder + "/" + token;
-        }
-        #endregion
-
         #region IStorage implementation
         public override bool HasFile(string token, out Metadata metadata)
         {

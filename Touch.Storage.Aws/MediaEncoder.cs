@@ -23,13 +23,13 @@ namespace Touch.Storage
             {
                 var inputJob = new JobInput
                 {
-                    Key = GetKey(source)
+                    Key = source
                 };
 
                 var outputJob = new CreateJobOutput
                 {
                     PresetId = _config.PresetId,
-                    Key = GetKey(output)
+                    Key = output
                 };
 
                 var response = client.CreateJob(new CreateJobRequest { Input = inputJob, Output = outputJob, PipelineId = _config.PipelineId });
@@ -41,11 +41,6 @@ namespace Touch.Storage
         private IAmazonElasticTranscoder GetClient()
         {
             return AWSClientFactory.CreateAmazonElasticTranscoderClient(_credentials);
-        }
-
-        private string GetKey(string key)
-        {
-            return _config.Path != null ? _config.Path + key : key;
         }
     }
 
