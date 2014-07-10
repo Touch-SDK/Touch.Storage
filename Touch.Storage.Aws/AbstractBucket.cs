@@ -13,7 +13,7 @@ namespace Touch.Storage
     abstract public class AbstractBucket : IStorage
     {
         #region .ctor
-        protected AbstractBucket(StorageConnectionStringBuilder connectionString, AWSCredentials credentials)
+        protected AbstractBucket(AwsStorageConnectionStringBuilder connectionString, AWSCredentials credentials)
         {
             if (connectionString == null) throw new ArgumentNullException("connectionString");
             _connectionString = connectionString;
@@ -29,13 +29,13 @@ namespace Touch.Storage
         #endregion
 
         #region Data
-        private readonly StorageConnectionStringBuilder _connectionString;
+        private readonly AwsStorageConnectionStringBuilder _connectionString;
         private readonly AWSCredentials _credentials;
         private readonly AmazonS3Config _config;
         #endregion
 
         #region Properties
-        protected StorageConnectionStringBuilder ConnectionString { get { return _connectionString; } }
+        protected AwsStorageConnectionStringBuilder ConnectionString { get { return _connectionString; } }
         #endregion
 
         #region Protected methods

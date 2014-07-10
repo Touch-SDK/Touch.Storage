@@ -13,7 +13,7 @@ namespace Touch.Storage
     {
         #region .ctor
         public Bucket(string connectionString, AWSCredentials credentials)
-            : base(new StorageConnectionStringBuilder { ConnectionString = connectionString }, credentials)
+            : base(new AwsStorageConnectionStringBuilder { ConnectionString = connectionString }, credentials)
         {
         }
         #endregion

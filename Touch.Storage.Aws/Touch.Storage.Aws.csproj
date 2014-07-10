@@ -40,6 +40,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,16 +48,15 @@
     <Reference Include="System.Xml" />
     <Reference Include="Touch, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Touch.1.0.2\lib\Touch.dll</HintPath>
-    </Reference>
-    <Reference Include="Touch.ServiceModel, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Touch.ServiceModel.1.0.1\lib\Touch.ServiceModel.dll</HintPath>
+      <HintPath>..\packages\Touch.1.0.6\lib\Touch.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractBucket.cs" />
+    <Compile Include="AwsEncoderConnectionStringBuilder.cs" />
+    <Compile Include="AwsStorageConnectionStringBuilder.cs" />
     <Compile Include="Bucket.cs" />
+    <Compile Include="MediaEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
