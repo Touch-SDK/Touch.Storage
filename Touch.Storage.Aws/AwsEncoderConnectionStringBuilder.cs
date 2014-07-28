@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using Amazon;
 
 namespace Touch.Storage
 {
@@ -11,9 +12,9 @@ namespace Touch.Storage
             set { this["Path"] = value ?? string.Empty; }
         }
 
-        public string Region
+        public RegionEndpoint Region
         {
-            get { return ContainsKey("Region") ? this["Region"] as string : null; }
+            get { return ContainsKey("Region") ? RegionEndpoint.GetBySystemName(this["Region"] as string) : null; }
             set { this["Region"] = value; }
         }
 

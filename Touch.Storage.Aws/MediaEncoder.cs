@@ -11,11 +11,16 @@ namespace Touch.Storage
         public MediaEncoder(AWSCredentials credentials, string connectionString)
         {
             _credentials = credentials;
-            _config = new AwsEncoderConnectionStringBuilder{ ConnectionString = connectionString };
+            _connectionString = new AwsEncoderConnectionStringBuilder{ ConnectionString = connectionString };
+            _config = new AmazonElasticTranscoderConfig
+            {
+                RegionEndpoint = _connectionString.Region
+            };
         }
 
         private readonly AWSCredentials _credentials;
-        private readonly AwsEncoderConnectionStringBuilder _config;
+        private readonly AwsEncoderConnectionStringBuilder _connectionString;
+        private readonly AmazonElasticTranscoderConfig _config;
 
         public MediaEncoderJob Encode(string source, string output)
         {
@@ -28,27 +33,28 @@ namespace Touch.Storage
 
                 var outputJob = new CreateJobOutput
                 {
-                    PresetId = _config.PresetId,
+                    PresetId = _connectionString.PresetId,
                     Key = output
                 };
 
-                var response = client.CreateJob(new CreateJobRequest { Input = inputJob, Output = outputJob, PipelineId = _config.PipelineId });
-                
-                return new AwsMediaEncoderJob(response.Job);
+                var response = client.CreateJob(new CreateJobRequest { Input = inputJob, Output = outputJob, PipelineId = _connectionString.PipelineId });
+
+                return new AwsMediaEncoderJob(response.Job, GetClient);
             }
         }
 
         private IAmazonElasticTranscoder GetClient()
         {
-            return AWSClientFactory.CreateAmazonElasticTranscoderClient(_credentials);
+            return AWSClientFactory.CreateAmazonElasticTranscoderClient(_credentials, _config);
         }
     }
 
     internal sealed class AwsMediaEncoderJob : MediaEncoderJob
     {
-        public AwsMediaEncoderJob(Job job)
+        public AwsMediaEncoderJob(Job job, Func<IAmazonElasticTranscoder> clientFactory)
         {
             _job = job;
+            _clientFactory = clientFactory;
 
             Token = Guid.NewGuid();
             Started = DateTime.UtcNow;
@@ -57,6 +63,7 @@ namespace Touch.Storage
         }
 
         private readonly Job _job;
+        private readonly Func<IAmazonElasticTranscoder> _clientFactory;
 
         public override Guid Token { get; protected set; }
 
@@ -70,10 +77,21 @@ namespace Touch.Storage
         {
             get
             {
-                switch (_job.Status)
+                using (var client = _clientFactory())
                 {
-                    default:
-                        return MediaEncoderJobStatus.Started;
+                    var response = client.ReadJob(new ReadJobRequest{ Id = _job.Id });
+
+                    switch (response.Job.Status)
+                    {
+                        case "Progressing":
+                            return MediaEncoderJobStatus.Started;
+
+                        case "Complete":
+                            return MediaEncoderJobStatus.Complete;
+
+                        default:
+                            return MediaEncoderJobStatus.Failed;
+                    }
                 }
             }
             protected set {}

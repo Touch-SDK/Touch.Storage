@@ -3,7 +3,6 @@ using System.IO;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.S3.Model;
 
 namespace Touch.Storage
 {
@@ -23,7 +22,7 @@ namespace Touch.Storage
 
             _config = new AmazonS3Config
             {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(_connectionString.Region)
+                RegionEndpoint = _connectionString.Region
             };
         } 
         #endregion
