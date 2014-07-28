@@ -7,10 +7,10 @@ namespace Touch.Storage
     sealed public class AwsStorageConnectionStringBuilder : DbConnectionStringBuilder
     {
         #region Properties
-        public string Host
+        public string PublicUrl
         {
-            get { return ContainsKey("Host") ? this["Host"] as string : null; }
-            set { this["Host"] = value; }
+            get { return ContainsKey("PublicUrl") ? this["PublicUrl"] as string : null; }
+            set { this["PublicUrl"] = value; }
         }
 
         public string Path
@@ -35,16 +35,6 @@ namespace Touch.Storage
         {
             get { return ContainsKey("ReducedRedundancy") && Convert.ToBoolean(this["ReducedRedundancy"]); }
             set { this["ReducedRedundancy"] = value; }
-        }
-
-        public string PublicEndpointUrl
-        {
-            get
-            {
-                if (Host == null) throw new NotSupportedException("Host name is not available.");
-
-                return "//" + Host + "/" + Path + (Path != string.Empty ? "/" : string.Empty);
-            }
         }
         #endregion
     }

@@ -42,6 +42,11 @@ namespace Touch.Storage
         {
             return AWSClientFactory.CreateAmazonS3Client(_credentials, _config);
         }
+
+        protected string GetBucketKey(string token)
+        {
+            return _connectionString.Path + token;
+        }
         #endregion
 
         #region IStorage methods

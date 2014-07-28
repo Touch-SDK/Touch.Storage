@@ -22,6 +22,7 @@ namespace Touch.Storage
         public override bool HasFile(string token, out Metadata metadata)
         {
             if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            token = GetBucketKey(token);
 
             using (var client = GetClient())
             {
@@ -31,7 +32,17 @@ namespace Touch.Storage
                                       Key = token
                                   };
 
-                var response = client.GetObjectMetadata(request);
+                GetObjectMetadataResponse response;
+
+                try
+                {
+                    response = client.GetObjectMetadata(request);
+                }
+                catch
+                {
+                    metadata = null;
+                    return false;
+                }                
 
                 metadata = new Metadata { ContentType = response.Metadata["Content-Type"] };
 
@@ -44,12 +55,16 @@ namespace Touch.Storage
 
         public override bool HasFile(string token)
         {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+
             Metadata metadata;
             return HasFile(token, out metadata);
         }
 
         public override void PutFile(Stream file, string token)
         {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+
             var metadata = new Metadata();
             PutFile(file, token, metadata);
         }
@@ -59,6 +74,8 @@ namespace Touch.Storage
             if (file == null) throw new ArgumentNullException("file");
             if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
             if (metadata == null) throw new ArgumentNullException("metadata");
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            token = GetBucketKey(token);
 
             using (var client = GetClient())
             {
@@ -80,13 +97,16 @@ namespace Touch.Storage
 
         public override Stream GetFile(string token)
         {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+
             Metadata metadata;
             return GetFile(token, out metadata);
         }
 
         public override Stream GetFile(string token, out Metadata metadata)
         {
-            if (string.IsNullOrEmpty(token)) throw new ArgumentNullException("token");
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            token = GetBucketKey(token);
 
             metadata = new Metadata();
 
@@ -111,8 +131,8 @@ namespace Touch.Storage
 
         public override void RemoveFile(string token)
         {
-            if (string.IsNullOrEmpty(token))
-                throw new ArgumentException("token");
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            token = GetBucketKey(token);
 
             using (var client = GetClient())
             {
@@ -128,13 +148,13 @@ namespace Touch.Storage
 
         public override string GetPublicUrl(string token)
         {
-            if (string.IsNullOrEmpty(token)) throw new ArgumentNullException("token");
             if (!IsPublic) throw new InvalidOperationException("Storage is not public.");
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
 
-            return "http:" + ConnectionString.PublicEndpointUrl + token;
+            return ConnectionString.PublicUrl + token;
         }
 
-        public override bool IsPublic { get { return !string.IsNullOrEmpty(ConnectionString.PublicEndpointUrl); } }
+        public override bool IsPublic { get { return !string.IsNullOrEmpty(ConnectionString.PublicUrl); } }
         #endregion
     }
 }
