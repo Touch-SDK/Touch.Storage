@@ -12,9 +12,9 @@ namespace Touch.Storage
             set { this["Path"] = value ?? string.Empty; }
         }
 
-        public RegionEndpoint Region
+        public string Region
         {
-            get { return ContainsKey("Region") ? RegionEndpoint.GetBySystemName(this["Region"] as string) : null; }
+            get { return ContainsKey("Region") ? this["Region"] as string : null; }
             set { this["Region"] = value; }
         }
 

@@ -22,7 +22,7 @@ namespace Touch.Storage
 
             _config = new AmazonS3Config
             {
-                RegionEndpoint = _connectionString.Region
+                RegionEndpoint = RegionEndpoint.GetBySystemName(_connectionString.Region)
             };
         } 
         #endregion

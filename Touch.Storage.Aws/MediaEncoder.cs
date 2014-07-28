@@ -14,7 +14,7 @@ namespace Touch.Storage
             _connectionString = new AwsEncoderConnectionStringBuilder{ ConnectionString = connectionString };
             _config = new AmazonElasticTranscoderConfig
             {
-                RegionEndpoint = _connectionString.Region
+                RegionEndpoint = RegionEndpoint.GetBySystemName(_connectionString.Region)
             };
         }
 

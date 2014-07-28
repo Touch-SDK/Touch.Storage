@@ -25,9 +25,9 @@ namespace Touch.Storage
             set { this["Bucket"] = value; }
         }
 
-        public RegionEndpoint Region
+        public string Region
         {
-            get { return ContainsKey("Region") ? RegionEndpoint.GetBySystemName(this["Region"] as string) : null; }
+            get { return ContainsKey("Region") ? this["Region"] as string : null; }
             set { this["Region"] = value; }
         }
 
