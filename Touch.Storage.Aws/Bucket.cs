@@ -44,7 +44,7 @@ namespace Touch.Storage
                     return false;
                 }                
 
-                metadata = new Metadata { ContentType = response.Metadata["Content-Type"] };
+                metadata = new Metadata { ContentType = response.Headers.ContentType };
 
                 foreach (var key in response.Metadata.Keys)
                     metadata[key] = response.Metadata[key];
@@ -120,7 +120,7 @@ namespace Touch.Storage
 
                 var response = client.GetObject(request);
 
-                metadata.ContentType = response.Metadata["Content-Type"];
+                metadata.ContentType = response.Headers.ContentType;
 
                 foreach (var key in response.Metadata.Keys)
                     metadata[key] = response.Metadata[key];
