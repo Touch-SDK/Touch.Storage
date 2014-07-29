@@ -24,6 +24,20 @@ namespace Touch.Storage
 
         public MediaEncoderJob Encode(string source, string output)
         {
+            return Encode(source, output, null);
+        }
+
+        public MediaEncoderJob Encode(string source, string output, string thumbnailsOutput)
+        {
+            if (string.IsNullOrWhiteSpace(source)) throw new ArgumentNullException("source");
+            if (string.IsNullOrWhiteSpace(output)) throw new ArgumentNullException("output");
+
+            source = GetPath(source);
+            output = GetPath(output);
+
+            if (!string.IsNullOrWhiteSpace(thumbnailsOutput))
+                thumbnailsOutput = GetPath(thumbnailsOutput);
+
             using (var client = GetClient())
             {
                 var inputJob = new JobInput
@@ -34,7 +48,8 @@ namespace Touch.Storage
                 var outputJob = new CreateJobOutput
                 {
                     PresetId = _connectionString.PresetId,
-                    Key = output
+                    Key = output,
+                    ThumbnailPattern = !string.IsNullOrWhiteSpace(thumbnailsOutput) ? thumbnailsOutput + "-{count}" : null
                 };
 
                 var response = client.CreateJob(new CreateJobRequest { Input = inputJob, Output = outputJob, PipelineId = _connectionString.PipelineId });
@@ -46,6 +61,11 @@ namespace Touch.Storage
         private IAmazonElasticTranscoder GetClient()
         {
             return AWSClientFactory.CreateAmazonElasticTranscoderClient(_credentials, _config);
+        }
+
+        private string GetPath(string path)
+        {
+            return _connectionString.Path + path;
         }
     }
 
