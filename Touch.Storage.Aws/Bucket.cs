@@ -74,7 +74,7 @@ namespace Touch.Storage
             if (file == null) throw new ArgumentNullException("file");
             if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
             if (metadata == null) throw new ArgumentNullException("metadata");
-            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+
             token = GetBucketKey(token);
 
             using (var client = GetClient())
@@ -92,6 +92,34 @@ namespace Touch.Storage
                     request.Metadata.Add(pair.Key, pair.Value);
 
                 client.PutObject(request);
+            }
+        }
+
+        public override void PutMetadata(string token, Metadata metadata)
+        {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            if (metadata == null) throw new ArgumentNullException("metadata");
+
+            token = GetBucketKey(token);
+
+            using (var client = GetClient())
+            {
+                var request = new CopyObjectRequest
+                {
+                    SourceBucket = ConnectionString.Bucket,
+                    DestinationBucket = ConnectionString.Bucket,
+                    SourceKey = token,
+                    DestinationKey = token,
+                    ContentType = metadata.ContentType, 
+                    MetadataDirective = S3MetadataDirective.REPLACE
+                };
+
+                request.Headers.ContentType = metadata.ContentType;
+
+                foreach (var pair in metadata)
+                    request.Metadata.Add(pair.Key, pair.Value);
+
+                client.CopyObject(request);
             }
         }
 

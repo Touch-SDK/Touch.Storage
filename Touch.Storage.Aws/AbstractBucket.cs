@@ -58,6 +58,8 @@ namespace Touch.Storage
 
         public abstract void PutFile(Stream file, string token, Metadata metadata);
 
+        public abstract void PutMetadata(string token, Metadata metadata);
+
         public abstract Stream GetFile(string token);
 
         public abstract Stream GetFile(string token, out Metadata metadata);
