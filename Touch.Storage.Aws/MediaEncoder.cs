@@ -1,4 +1,6 @@
 ﻿using System;
+using System.CodeDom;
+using System.Threading;
 using Amazon;
 using Amazon.ElasticTranscoder;
 using Amazon.ElasticTranscoder.Model;
@@ -85,36 +87,48 @@ namespace Touch.Storage
         private readonly Job _job;
         private readonly Func<IAmazonElasticTranscoder> _clientFactory;
 
-        public override Guid Token { get; protected set; }
-
-        public override string Source { get; protected set; }
-
-        public override string Output { get; protected set; }
-
-        public override DateTime Started { get; protected set; }
-
         public override MediaEncoderJobStatus Status
         {
             get
             {
+                if (_status != MediaEncoderJobStatus.Started)
+                    return _status;
+
                 using (var client = _clientFactory())
                 {
                     var response = client.ReadJob(new ReadJobRequest{ Id = _job.Id });
-
+                    
                     switch (response.Job.Status)
                     {
+                        case "Submitted":
                         case "Progressing":
-                            return MediaEncoderJobStatus.Started;
+                            return _status = MediaEncoderJobStatus.Started;
 
                         case "Complete":
-                            return MediaEncoderJobStatus.Complete;
+                            Ended = DateTime.UtcNow;
+                            return _status = MediaEncoderJobStatus.Complete;
 
                         default:
-                            return MediaEncoderJobStatus.Failed;
+                            Ended = DateTime.UtcNow;
+                            return _status = MediaEncoderJobStatus.Failed;
                     }
                 }
             }
             protected set {}
+        }
+        private MediaEncoderJobStatus _status;
+
+        public override MediaEncoderJobStatus Wait()
+        {
+            if (_status != MediaEncoderJobStatus.Started)
+                throw new InvalidOperationException();
+
+            while (Status == MediaEncoderJobStatus.Started)
+            {
+                Thread.Sleep(2000);
+            }
+
+            return Status;
         }
     }
 }
