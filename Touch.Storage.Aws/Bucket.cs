@@ -44,7 +44,12 @@ namespace Touch.Storage
                     return false;
                 }                
 
-                metadata = new Metadata { ContentType = response.Headers.ContentType };
+                metadata = new Metadata
+                {
+                    ContentType = response.Headers.ContentType,
+                    LastModified = response.LastModified,
+                    ETag = response.ETag
+                };
 
                 foreach (var key in response.Metadata.Keys)
                     metadata[key] = response.Metadata[key];
@@ -149,6 +154,8 @@ namespace Touch.Storage
                 var response = client.GetObject(request);
 
                 metadata.ContentType = response.Headers.ContentType;
+                metadata.LastModified = response.LastModified;
+                metadata.ETag = response.ETag;
 
                 foreach (var key in response.Metadata.Keys)
                     metadata[key] = response.Metadata[key];
