@@ -128,12 +128,49 @@ namespace Touch.Storage
             }
         }
 
+        public override Metadata GetMetadata(string token)
+        {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            token = GetBucketKey(token);
+
+            var metadata = new Metadata();
+
+            using (var client = GetClient())
+            {
+                var request = new GetObjectMetadataRequest
+                {
+                    BucketName = ConnectionString.Bucket,
+                    Key = token
+                };
+
+                var response = client.GetObjectMetadata(request);
+
+                metadata.ContentType = response.Headers.ContentType;
+                metadata.LastModified = response.LastModified;
+                metadata.ETag = response.ETag;
+
+                foreach (var key in response.Metadata.Keys)
+                    metadata[key] = response.Metadata[key];
+            }
+
+            return metadata;
+        }
+
         public override Stream GetFile(string token)
         {
             if (string.IsNullOrEmpty(token)) throw new ArgumentException("token");
+            token = GetBucketKey(token);
 
-            Metadata metadata;
-            return GetFile(token, out metadata);
+            using (var client = GetClient())
+            {
+                var request = new GetObjectRequest
+                {
+                    BucketName = ConnectionString.Bucket,
+                    Key = token
+                };
+
+                return client.GetObject(request).ResponseStream;
+            }
         }
 
         public override Stream GetFile(string token, out Metadata metadata)
